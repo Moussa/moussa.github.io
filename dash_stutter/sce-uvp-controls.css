@@ -1,0 +1,442 @@
+/* SIE CONFIDENTIAL PlayStation(R)5 Programmer Tool Runtime Library Release 1.00.00.26-00.00.00.0.1
+ * Copyright (C) 2019 Sony Interactive Entertainment Inc.
+ */
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg)  translate(-50%, -50%);
+  }
+  100% {
+    transform: rotate(360deg) translate(-50%, -50%);
+  }
+}
+
+.sce-uvp {
+  --ctls-playhead-anim: cubic-bezier(.21,.9,.5,.99);
+  --ctls-playhead-anim-time: 200ms;
+
+  --h1-fontsize: 40px;
+  --h2-fontsize: 32px;
+  --timecode-fontsize: 16px;
+  --skiptime-fontsize: 16px;
+  --timeline-extra-pad: 6px;
+
+  --skiptime-width: 60px;
+
+  /* fullscreen controls */
+  --fsctls-anim-height: -100px;
+  --fsctls-playbtn-size: 72px;
+  --fsctls-playbtn-blur-size: 16px;
+
+  --fsctls-animshow: cubic-bezier(.2,.8,.5,.9);
+  --fsctls-animshow-time: 400ms;
+  --fsctls-animhide: cubic-bezier(.6,.1,.8,.9);
+  --fsctls-animhide-time: 400ms;
+
+  --fsctls-menu-gradient: radial-gradient(at bottom left, rgba(107,101,90,.5) 0%, rgba(97,91,81,0.4) 30%, rgba(66,62,56,.35) 70%, rgba(77,72,64,0.35) 100%);
+
+  /* mini controls */
+  --ctls-playbtn-size: 24px;
+  --ctls-playbtn-blur-size: 12px;
+  --ctls-animshow: ease-out;
+  --ctls-animshow-time: 200ms;
+  --ctls-animhide: ease-out;
+  --ctls-animhide-time: 700ms;
+}
+
+.sce-uvp-controls-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  color: rgba(255,255,255,0.9);
+}
+
+.sce-uvp-controls {
+  position: relative;
+  width: 100%;
+}
+
+.sce-uvp-controls .sce-uvp-bg {
+  padding: 10% 4.38% 1% 4.38%;
+}
+
+.sce-uvp-controls h1, .sce-uvp-controls h2 {
+  text-align: left;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.sce-uvp-controls h1 {
+  font-family: 'SST', Helvetica, Arial, Sans-Serif;
+  font-weight: bold;
+  font-size: var(--h1-fontsize);
+  line-height: var(--h1-fontsize);
+  text-transform: capitalize;
+}
+
+.sce-uvp-controls h2 {
+  font-family: 'SST Ultra light', Helvetica, Arial, Sans-Serif;
+  font-size: var(--h2-fontsize);
+  line-height: var(--h2-fontsize);
+  color: rgba(255,255,255,0.75);
+  font-weight: 100;
+}
+
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-menu {
+  display: none;
+}
+.sce-uvp-menu {
+  display: flex;
+  position: relative;
+  flex-direction: row-reverse;
+}
+.sce-uvp-menu button {
+  display: flex;
+  justify-content: space-between;
+  background: none;
+  color: #ffffff;
+  width: 100%;
+  margin: 0;
+}
+.sce-uvp-menu > button {
+  width: auto;
+}
+.sce-uvp-menu button span {
+  color: #a6a6a6;
+  margin-left: 15px;
+}
+.sce-uvp-menu > button {
+  background: var(--fsctls-menu-gradient);
+}
+
+.sce-uvp-menu button {
+  border: none;
+  outline: none;
+  padding: 0 14px;
+  font-size: 22px;
+  line-height: 50px;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+}
+.sce-uvp-menu button:focus {
+  box-shadow: 0px 0px 18px 0px #FFF;
+}
+.sce-uvp-menu-list, 
+.sce-uvp-menu-values {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: #000;
+}
+.sce-uvp-menu-list ul, 
+.sce-uvp-menu-values ul {
+  list-style: none;
+  background: var(--fsctls-menu-gradient);
+  padding: 0;
+  margin: 0;
+}
+
+.sce-uvp-menu-open .sce-uvp-menu-list,
+.sce-uvp-menu-open .sce-uvp-menu-values:not(:empty){
+  display: block;
+}
+
+.sce-uvp-controls .sce-uvp-timeline-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sce-uvp-controls .timecode {
+  font-family: 'SST', Helvetica, Arial, Sans-Serif;
+  font-size: var(--timecode-fontsize);
+  line-height: var(--timecode-fontsize);
+  letter-spacing: 0;
+  white-space: nowrap;
+  word-spacing: -2px;
+}
+
+.sce-uvp-lhs-timecode {
+  padding-right: 16px
+}
+
+.sce-uvp-rhs-timecode {
+  padding-left: 16px
+}
+
+.sce-uvp-controls .sce-uvp-hh,
+.sce-uvp-controls .sce-uvp-mm,
+.sce-uvp-controls .sce-uvp-ss {
+  letter-spacing: 1px;
+
+  /* Fixed-width blocks are necessary unless we can find a fixed-width font for the timer. */
+  /* Using min-width so hour can grow beyond 2 chars -- others are limited mathematically. */
+  min-width: 19px;
+  display: inline-block;
+}
+
+.sce-uvp-live {
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.sce-uvp-live-dot {
+  display: inline-block;
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  margin: 2px 2px 2px 0;
+}
+
+.sce-uvp-controls:not(.is-sce-uvp-at-live-point) .sce-uvp-live-dot {
+  background-color: white;
+}
+
+.sce-uvp-controls.is-sce-uvp-at-live-point .sce-uvp-live-dot {
+  background-color: red;  
+}
+
+.sce-uvp-controls .sce-uvp-timeline-outer {
+  position: relative;
+  width: 100%;
+}
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-timeline-outer {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: calc(var(--fsctls-playbtn-size)/2 + var(--timeline-extra-pad));
+  margin-left: calc(var(--fsctls-playbtn-size)/2 + var(--timeline-extra-pad));
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-timeline-outer {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: calc(var(--ctls-playbtn-size)/2 + var(--timeline-extra-pad));
+  margin-left: calc(var(--ctls-playbtn-size)/2 + var(--timeline-extra-pad));
+}
+
+.sce-uvp-controls .sce-uvp-timeline-inner {
+  position: relative;
+}
+.sce-uvp-controls .sce-uvp-timeline-playhead-box {
+  position: absolute;
+  display: flex;
+
+  top: 50%;
+  transform: translate(0,-50%);
+  left: 0;
+  right: 0;
+
+  border-radius: 2px;
+  overflow: hidden;
+
+  height: 4px;
+  background-color: rgb(255,255,255,0.15);
+}
+
+.sce-uvp-controls:not(.is-sce-uvp-live) .sce-uvp-playhead {
+  background-color: rgb(255,255,255,0.6);
+}
+.sce-uvp-controls.is-sce-uvp-live .sce-uvp-playhead {
+  background-color: rgb(255,0,0,0.6);
+}
+
+.sce-uvp-controls .sce-uvp-timeline-playpause {
+  position: relative;
+  border-radius: 50%;
+  opacity: 0.87;
+  background-color: white;
+}
+
+.is-sce-uvp-loading .sce-uvp-player-container:after {
+  opacity: 1;
+} 
+
+.sce-uvp-player-container:after {
+  content: '';
+  width: 96px;
+  height: 96px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: left top;
+  transform: translate(-50%, -50%);
+  display: block;
+  opacity: 0;
+  transition: opacity .5s;
+  animation: spin 1s infinite linear;
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg xmlns:dc='http://purl.org/dc/elements/1.1/' xmlns:cc='http://creativecommons.org/ns%23' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns%23' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='svg8' version='1.1' viewBox='0 0 25.399999 25.399999' height='96' width='96'%3E%3Cdefs id='defs2'%3E%3ClinearGradient id='linearGradient4785'%3E%3Cstop id='stop4781' offset='0' style='stop-color:%23ffffff;stop-opacity:1' /%3E%3Cstop style='stop-color:%23ffffff;stop-opacity:1' offset='0.27757955' id='stop4793' /%3E%3Cstop style='stop-color:%239c8466;stop-opacity:0.80392158' offset='0.62832588' id='stop4791' /%3E%3Cstop style='stop-color:%233a312e;stop-opacity:0.03921569' offset='0.90399283' id='stop4789' /%3E%3Cstop id='stop4795' offset='0.97405022' style='stop-color:%23000000;stop-opacity:0' /%3E%3Cstop id='stop4783' offset='1' style='stop-color:%23646464;stop-opacity:0;' /%3E%3C/linearGradient%3E%3CradialGradient gradientUnits='userSpaceOnUse' gradientTransform='matrix(1.8811702,1.3456788,2.0411004,-2.8533255,-616.19837,1017.8333)' r='7.0114585' fy='277.05502' fx='33.829128' cy='277.05502' cx='33.829128' id='radialGradient4787' xlink:href='%23linearGradient4785' /%3E%3Cfilter id='filter4867' style='color-interpolation-filters:sRGB;'%3E%3CfeFlood id='feFlood4857' result='flood' flood-color='rgb(0,0,0)' flood-opacity='0.498039' /%3E%3CfeComposite id='feComposite4859' result='composite1' operator='in' in2='SourceGraphic' in='flood' /%3E%3CfeGaussianBlur id='feGaussianBlur4861' result='blur' stdDeviation='0.5' in='composite1' /%3E%3CfeOffset id='feOffset4863' result='offset' dy='0' dx='0' /%3E%3CfeComposite id='feComposite4865' result='composite2' operator='over' in2='offset' in='SourceGraphic' /%3E%3C/filter%3E%3C/defs%3E%3Cmetadata id='metadata5'%3E%3Crdf:RDF%3E%3Ccc:Work rdf:about=''%3E%3Cdc:format%3Eimage/svg+xml%3C/dc:format%3E%3Cdc:type rdf:resource='http://purl.org/dc/dcmitype/StillImage' /%3E%3Cdc:title%3E%3C/dc:title%3E%3C/cc:Work%3E%3C/rdf:RDF%3E%3C/metadata%3E%3Cg transform='translate(0,-271.6)' id='layer1'%3E%3Cpath id='path4726' d='m 12.748196,271.6 a 1.2747984,1.2700125 0 0 1 1.274721,1.26994 1.2747984,1.2700125 0 0 1 -1.274721,1.26993 c -5.647435,0 -10.198427,4.53389 -10.19842,10.16012 0,5.62625 4.550985,10.16014 10.19842,10.16014 a 1.2747984,1.2700125 0 0 1 1.274721,1.26993 A 1.2747984,1.2700125 0 0 1 12.748196,297 C 5.722781,297 0,291.29904 0,284.29999 0,277.30096 5.722781,271.6 12.748196,271.6 Z' style='fill:url(%23radialGradient4787);fill-opacity:1;stroke:none;stroke-width:1.3938154;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.39215686;filter:url(%23filter4867)' /%3E%3C/g%3E%3C/svg%3E%0A");
+}
+
+.sce-uvp:focus .sce-uvp-controls .sce-uvp-playing {
+  background-image: url(data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSIwIDAgNjQgNjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0iY29udHJvbF9wYXVzZSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Im1lZGlhL2ljb25pZF9jb250cm9sX3BhdXNlIiBmaWxsPSIjMDAwMDAwIj4KICAgICAgICAgICAgPHBhdGggZD0iTTM1LjA4Miw0NC42OTEgTDQzLjY1LDQ0LjY5MSBMNDMuNjUsMTkuMzA5IEwzNS4wODIsMTkuMzA5IEwzNS4wODIsNDQuNjkxIFogTTIwLjM1LDQ0LjY5MSBMMjguOTMzLDQ0LjY5MSBMMjguOTMzLDE5LjMwOSBMMjAuMzUsMTkuMzA5IEwyMC4zNSw0NC42OTEgWiIgaWQ9IkZpbGwtMyI+PC9wYXRoPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+);
+}
+.sce-uvp:focus .sce-uvp-controls .sce-uvp-pausing {
+  background-image: url(data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSIwIDAgNjQgNjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0iY29udHJvbF9wbGF5IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0ibWVkaWEvaWNvbmlkX2NvbnRyb2xfcGxheSIgZmlsbD0iIzAwMDAwMCI+CiAgICAgICAgICAgIDxwb2x5Z29uIGlkPSJGaWxsLTMiIHBvaW50cz0iMTkgNDYuMzgzOCA1Mi44NiAzMi4wMDM4IDE5IDE3LjYxNTgiPjwvcG9seWdvbj4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==);
+}
+.sce-uvp:focus .sce-uvp-controls .sce-uvp-skip-forward {
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='48px' height='48px' viewBox='0 0 48 48' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cg id='icon-skip-forward' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='Group'%3E%3Crect id='Rectangle-2' x='0' y='0' width='48' height='48'%3E%3C/rect%3E%3C/g%3E%3Cg id='Group-2' transform='translate(7.000000, 5.000000)' fill='%23000'%3E%3Cpath d='M17,5.14285714 C9.05559629,5.14285714 2.61538462,11.47483 2.61538462,19.2857143 C2.61538462,27.0965986 9.05559629,33.4285714 17,33.4285714 C24.9444037,33.4285714 31.3846154,27.0965986 31.3846154,19.2857143 L34,19.2857143 C34,28.5167594 26.3888407,36 17,36 C7.61115925,36 0,28.5167594 0,19.2857143 C0,10.0546692 7.61115925,2.57142857 17,2.57142857 L17,0 L23.5384615,3.85725009 L17,7.71428571 L17,5.14285714 Z' id='Combined-Shape'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A");
+}
+.sce-uvp:focus .sce-uvp-controls .sce-uvp-skip-back {
+  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='48px' height='48px' viewBox='0 0 48 48' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cg id='icon-skip-back' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='Group'%3E%3Crect id='Rectangle-2' x='0' y='0' width='48' height='48'%3E%3C/rect%3E%3C/g%3E%3Cg id='Group-2' transform='translate(7.000000, 5.000000)' fill='%23000'%3E%3Cpath d='M17,2.57142857 C26.3888407,2.57142857 34,10.0546692 34,19.2857143 C34,28.5167594 26.3888407,36 17,36 C7.61115925,36 0,28.5167594 0,19.2857143 L2.61538462,19.2857143 C2.61538462,27.0965986 9.05559629,33.4285714 17,33.4285714 C24.9444037,33.4285714 31.3846154,27.0965986 31.3846154,19.2857143 C31.3846154,11.47483 24.9444037,5.14285714 17,5.14285714 L17,7.71428571 L10.4615385,3.85725009 L17,0 L17,2.57142857 Z' id='Combined-Shape'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A");
+}
+.sce-uvp-controls .sce-uvp-quality-adjust {
+  background-image: url("data:image/svg+xml,%3Csvg height='64' viewBox='0 0 64 64' width='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-rule='evenodd' transform='translate(11 15)'%3E%3Cpath d='m34.1576 12.8259h-1.7c-.792 2.246-2.937 3.864-5.448 3.864-2.515 0-4.661-1.618-5.449-3.864h-13.722c-1.054 0-1.913-.855-1.913-1.913s.859-1.914 1.913-1.914h13.722c.792-2.245 2.934-3.86 5.449-3.86 2.511 0 4.652 1.611 5.445 3.857l1.703.003c1.058 0 1.914.856 1.914 1.914s-.856 1.913-1.914 1.913m0 12.171-7.713.004c-.792 2.246-2.933 3.86-5.444 3.86-2.512 0-4.656-1.614-5.449-3.86l-7.713-.004c-1.054 0-1.913-.856-1.913-1.913 0-1.058.859-1.913 1.913-1.913h7.713c.789-2.246 2.933-3.861 5.449-3.861 2.511 0 4.652 1.615 5.448 3.861h7.709c1.058 0 1.914.855 1.914 1.913 0 1.057-.856 1.913-1.914 1.913m5.24-19.929c-5.942-2.668-12.112-4.089-18.397-4.085-6.286-.004-12.46 1.417-18.398 4.085-1.139 3.057-1.786 7.414-1.824 11.932.038 4.514.685 8.876 1.824 11.929 5.938 2.668 12.112 4.091 18.398 4.088 6.285.003 12.455-1.42 18.397-4.088 1.14-3.053 1.786-7.415 1.823-11.929-.037-4.518-.683-8.875-1.823-11.932'/%3E%3Cpath d='m21.0004 21.1364c-1.077 0-1.951.875-1.951 1.947 0 1.076.874 1.951 1.951 1.951 1.072 0 1.946-.875 1.946-1.951 0-1.072-.874-1.947-1.946-1.947'/%3E%3Cpath d='m27.0091 8.9655c-1.076 0-1.951.874-1.951 1.947 0 1.076.875 1.95 1.951 1.95 1.072 0 1.947-.874 1.947-1.95 0-1.073-.875-1.947-1.947-1.947'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  background-position: center;
+}
+
+.sce-uvp-controls.is-sce-uvp-playing .sce-uvp-pause,
+.sce-uvp-controls:not(.is-sce-uvp-playing) .sce-uvp-playing,
+.sce-uvp-controls.is-sce-uvp-playing .sce-uvp-pausing,
+.sce-uvp-controls:not(.is-sce-uvp-playing) .sce-uvp-playing,
+.sce-uvp-controls:not(.is-sce-uvp-skipping) .sce-uvp-skip-forward,
+.sce-uvp-controls:not(.is-sce-uvp-skipping) .sce-uvp-skip-back,
+.sce-uvp-controls:not(.is-sce-uvp-skipping) .sce-uvp-skip-time,
+.sce-uvp-controls.is-sce-uvp-skipping .sce-uvp-playing,
+.sce-uvp-controls.is-sce-uvp-skipping .sce-uvp-pausing,
+.sce-uvp-controls.is-sce-uvp-skipping-back .sce-uvp-skip-forward,
+.sce-uvp-controls:not(.is-sce-uvp-skipping-back) .sce-uvp-skip-back,
+.sce-uvp-controls.is-sce-uvp-live .sce-uvp-time-rhs,
+.sce-uvp-controls:not(.is-sce-uvp-live) .sce-uvp-live,
+.sce-uvp-controls.is-sce-uvp-live .sce-uvp-lhs-timecode {
+    display: none;
+}
+
+/**
+ * Fullscreen / non-fullscreen state changes
+ */
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-bg {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.8) 50%);
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-bg {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.8) 80%);;
+  height: 36px;
+}
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-timeline-box {
+  padding: 14px 0 0;
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-timeline-box {
+  padding: 8px 0;
+}
+
+.sce-uvp-timeline-playpause {
+  transform: translate(-50%, 0);
+  cursor: pointer;
+}
+
+.sce-uvp-controls:not(.is-sce-uvp-live) .sce-uvp-timeline-playpause {
+  transition: left 200ms cubic-bezier(.21,.9,.5,.99);
+}
+
+.sce-uvp-playing, .sce-uvp-pausing, .sce-uvp-skip-back, .sce-uvp-skip-forward {
+  background-repeat: no-repeat;
+}
+
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-playing,
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-pausing,
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-timeline-playpause {
+  width: var(--fsctls-playbtn-blur-size);
+  height: var(--fsctls-playbtn-blur-size);
+  margin-top: calc((var(--fsctls-playbtn-size) - var(--fsctls-playbtn-blur-size)) / 2);
+  margin-bottom: calc((var(--fsctls-playbtn-size) - var(--fsctls-playbtn-blur-size)) / 2);
+}
+.sce-uvp:focus.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-playing,
+.sce-uvp:focus.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-pausing,
+.sce-uvp:focus.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-skip-forward,
+.sce-uvp:focus.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-skip-back,
+.sce-uvp:focus.is-sce-uvp-fullscreen .sce-uvp-controls .sce-uvp-timeline-playpause {
+  width: var(--fsctls-playbtn-size);
+  height: var(--fsctls-playbtn-size);
+  background-size: var(--fsctls-playbtn-size);
+  margin: 0;
+}
+
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-playing,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-pausing,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-forward,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-back,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-timeline-playpause {
+  width: var(--ctls-playbtn-blur-size);
+  height: var(--ctls-playbtn-blur-size);
+  margin-top: calc((var(--ctls-playbtn-size) - var(--ctls-playbtn-blur-size)) / 2);
+  margin-bottom: calc((var(--ctls-playbtn-size) - var(--ctls-playbtn-blur-size)) / 2);
+}
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-playing,
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-pausing,
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-forward,
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-back,
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-timeline-playpause {
+  width: var(--ctls-playbtn-size);
+  height: var(--ctls-playbtn-size);
+  margin: 0;
+}
+
+.sce-uvp .sce-uvp-skip-time {
+  position: absolute;
+  text-align: center;
+  font-size: var(--skiptime-fontsize);
+  letter-spacing: 0.5;
+  left: calc( var(--fsctls-playbtn-blur-size) / 2);
+  transform: translateX(-50%);
+}
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-skip-time {
+  bottom: calc(0px - var(--skiptime-fontsize) - 4px);
+  left: calc( var(--fsctls-playbtn-size) / 2);
+}
+.sce-uvp:focus:not(.is-sce-uvp-fullscreen) .sce-uvp-skip-time {
+  left: calc( var(--ctls-playbtn-size) / 2);
+}
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls:not(.is-sce-uvp-skipping) .sce-uvp-skip-time {
+  opacity: 0;
+}
+.sce-uvp.is-sce-uvp-fullscreen .sce-uvp-controls.is-sce-uvp-skipping .sce-uvp-skip-time {
+  opacity: 1;
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-playing,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-pausing {
+  background-size: var(--ctls-playbtn-size);
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-forward,
+.sce-uvp:not(.is-sce-uvp-fullscreen) .sce-uvp-controls .sce-uvp-skip-back {
+  background-position: 2px 2px;
+  background-size: calc(var(--ctls-playbtn-size) - 2px);
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen) h1,
+.sce-uvp:not(.is-sce-uvp-fullscreen) h2 {
+  display: none;
+}  
+.sce-uvp.is-sce-uvp-fullscreen h1,
+.sce-uvp.is-sce-uvp-fullscreen h2 {
+  display: block;
+  padding: 4px 0;
+}
+.sce-uvp:not(.sce-uvp-hide-controls).is-sce-uvp-fullscreen .sce-uvp-controls {
+  transition: bottom var(--fsctls-animshow-time) var(--fsctls-animshow);
+  bottom: 0px;
+}
+.sce-uvp.sce-uvp-hide-controls.is-sce-uvp-fullscreen .sce-uvp-controls {
+  transition: bottom var(--fsctls-animhide-time) var(--fsctls-animhide);
+  bottom: var(--fsctls-anim-height);
+}
+
+.sce-uvp:not(.sce-uvp-hide-controls).is-sce-uvp-fullscreen .sce-uvp-bg {
+  transition: opacity var(--fsctls-animshow-time) var(--fsctls-animshow);
+  opacity: 1;
+}
+.sce-uvp.sce-uvp-hide-controls.is-sce-uvp-fullscreen .sce-uvp-bg {
+  transition: opacity var(--fsctls-animhide-time) var(--fsctls-animhide);
+  opacity: 0;
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen):not(.sce-uvp-hide-controls) .sce-uvp-bg {
+  transition: opacity var(--ctls-animshow-time) var(--ctls-animshow);
+  opacity: 1;
+}
+.sce-uvp:not(.is-sce-uvp-fullscreen).sce-uvp-hide-controls .sce-uvp-bg {
+  transition: opacity var(--ctls-animhide-time) var(--ctls-animhide);
+  opacity: 0;
+}

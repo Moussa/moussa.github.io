@@ -1,0 +1,33 @@
+﻿<html>
+  <head>
+    <title>Plex BreakNonKeyframes stutter</title>
+
+    <!-- Include UVP CSS files -->
+    <link href="sce-uvp.css" rel="stylesheet" type="text/css">
+    <link href="sce-uvp-controls.css" rel="stylesheet" type="text/css">
+    <!-- Include default dash.js library supported by UVP -->
+    <script src="dash.js" type="application/JavaScript"></script>
+    <!-- Include the Universal Video Player ES6 Module -->
+    <script src="sce-uvp.esm.js" type="module"></script>
+    <!-- Include Spatial Navigation library for controller input support -->
+    <script src="spatial_navigation.js" type="application/JavaScript"></script>
+    <!-- Include the Simple Sample application code -->
+    <script src="index.js" type="module"></script>
+  </head>
+  <style>
+    body {
+        font-family: "sans-serif";
+        background-color: rgb(33, 33, 33);
+        margin: 0
+    }
+  </style>
+  <body>
+    <!-- container div for UVP -->
+    <div id="video-root"></div>
+
+    <div style="position:absolute; left:20px; top: 20px; background-color: white; padding: 10px;">
+      <p style="font-family: sans-serif"><strong>Universal Video Player</strong><br>
+        Plex BreakNonKeyframes stutter</p>
+    </div>
+  </body>
+</html>

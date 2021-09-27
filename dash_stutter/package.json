@@ -1,0 +1,11 @@
+{
+  "name": "uvp-video-test-sample",
+  "version": "1.0.0",
+  "description": "Sample web applicaiton for testing UVP",
+  "scripts": {
+    "start": "static . -a 0.0.0.0"
+  },
+  "devDependencies": {
+    "node-static": "^0.7.11"
+  }
+}

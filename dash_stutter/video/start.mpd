@@ -1,0 +1,9 @@
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" profiles="urn:mpeg:dash:profile:isoff-live:2011" type="static" mediaPresentationDuration="PT0H1M2.184S" maxSegmentDuration="PT2S" minBufferTime="PT10S">
+<script/>
+<Period start="PT0S" id="0" duration="PT0H1M2.184S">
+<AdaptationSet segmentAlignment="true">
+<SegmentTemplate timescale="1" duration="1" initialization="header" media="chunk-$Number$.m4s" startNumber="1"> </SegmentTemplate>
+<Representation id="0" mimeType="video/mp4" codecs="avc1.64002a" bandwidth="166000" width="1920" height="1080"> </Representation>
+</AdaptationSet>
+</Period>
+</MPD>
