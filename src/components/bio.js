@@ -45,11 +45,7 @@ const Bio = () => {
       {author?.name && (
         <p>
           I'm <strong>{author.name}</strong>. I live in London and I'm a
-          software engineer at{" "}
-          <a href="https://plex.tv" target="_blank" rel="noreferrer">
-            Plex
-          </a>
-          . You can find me on{" "}
+          software engineer. You can find me on{" "}
           <a
             href={`https://github.com/${social?.github || ``}`}
             target="_blank"
